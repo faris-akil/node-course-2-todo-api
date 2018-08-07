@@ -31,22 +31,44 @@ app.get("/api/todos", (req, res) => {
   })
 });
 
+
 app.get("/api/todos/:id", (req,res) => {
   var id = req.params.id;
-  if (!ObjectID.isValid(id)){
-    return res.status(404).send();
+
+  if(!ObjectID.isValid(id)){
+    return res.status(404).send({message: "Id not Valid"});
   }
+
   Todo.findById(id).then((todo) => {
-    if(!todo){
-      console.log("todo not found");
-      return res.status(404).send([]);
-    } else{
-      return res.send({todo});
+    if (!todo){
+      return res.status(404).send({message: "Todo not found"});
     }
-  },(e) => {
-    return res.status(400).send(e);
+
+    res.send({todo});
+  }).catch((e) => {
+    res.status(400).send({message: "Error occured"});
+  });
+});
+
+app.delete("/api/todos/:id", (req,res) => {
+  var id=req.params.id;
+
+  if(!ObjectID.isValid(id)){
+    return res.status(404).send({message: "id not valid"});
+  }
+
+  Todo.findByIdAndRemove(id).then((todo) => {
+    if(!todo){
+      return res.status(404).send({message: "todo not found"});
+    }
+    if(todo === null){
+      return res.status(400).send({message: "todo already deleted"});
+    }
+    res.send({todo});
+  }).catch((e) => {
+    res.status(400).send();
   })
-})
+});
 
 app.listen(port, () => {
   console.log(`Start on port number ${port}`);
