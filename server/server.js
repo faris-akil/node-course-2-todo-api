@@ -95,6 +95,19 @@ app.patch('/api/todos/:id', (req, res) => {
   })
 });
 
+app.post("/api/users", (req,res) => {
+  var user_info = _.pick(req.body, ["email", "password"]);
+  console.log(user_info);
+  var user = new User(user_info);
+  user.save().then(() => {
+    return user.generateAuthToken();
+  }).then((token) => {
+    res.header("x-auth", token).send(user);
+  }).catch((e)  => {
+    res.status(400).send({message: "User not added. An error occured", error: e});
+  })
+});
+
 app.listen(port, () => {
   console.log(`Start on port number ${port}`);
 })
