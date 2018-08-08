@@ -6,6 +6,7 @@ var {mongoose} = require("./db/mongoose.js");
 var {Todo} = require("./models/todo.js");
 var {User} = require("./models/user.js");
 var {ObjectID} = require("mongodb");
+var {authenticate} = require("./middleware/authenticate.js");
 
 var app = express();
 const port = process.env.PORT || 3000;
@@ -106,6 +107,12 @@ app.post("/api/users", (req,res) => {
   }).catch((e)  => {
     res.status(400).send({message: "User not added. An error occured", error: e});
   })
+});
+
+
+
+app.get("/users/me", authenticate, (req,res) => {
+  res.send(req.user);
 });
 
 app.listen(port, () => {
